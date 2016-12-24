@@ -1,0 +1,58 @@
+<?php
+
+//generates a form form a table in MySQL 
+//PHPQuickForm($table)
+//eg : PHPQuickForm("products");
+//uses $conn globally for mysql link... 
+
+function PHPQuickForm($table)
+{
+	global $conn;
+	//lets get the feilds for the form. 
+	$sql = "DESCRIBE `$table`";
+	$result = mysqli_query($conn, $sql);
+	
+
+	echo "Please enter the following fields:</br>";
+	if (mysqli_num_rows($result) > 0) {
+	  // output data of each row
+	 	while($row = mysqli_fetch_assoc($result)) 
+	 	{
+        //echo "</br>".$row['Field'].",".$row['Type'].",".$row['Key'];
+        if($row['Key']=='PRI')
+        {echo $row['Field']." is the primary Key.</br>";}
+        else
+	        {
+	        	echo $row['Field'].":";
+	        	if(strpos($row['Type'], 'varchar') !== false)
+	        		{
+	        			echo'Type=Varchar';
+	        		}
+	        	if(strpos($row['Type'], 'decimal') !== false)
+	        		{
+	        			echo'Type=decimal';
+	        		}
+	        	if(strpos($row['Type'], 'datetime') !== false)
+	        		{
+	        			echo'Type=date';
+	        		}
+	        	if(strpos($row['Type'], 'smallint') !== false)
+	        		{
+	        			echo'Type=smallint';
+	        		}
+	        	echo "</br>";
+	        }
+       
+	 	}
+	  
+	
+	} 
+	 else 
+	 {
+	 	echo " No columns found.";
+	 }
+	
+	
+}
+
+?>
