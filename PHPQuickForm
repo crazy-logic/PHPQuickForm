@@ -5,6 +5,9 @@
 //eg : PHPQuickForm("products");
 //uses $conn globally for mysql link... 
 
+//first was prototype, 
+//02-01-2018 - added a new field generator function (not merged into main yet)
+
 function PHPQuickForm($table)
 {
 	global $conn;
@@ -54,5 +57,77 @@ function PHPQuickForm($table)
 	
 	
 }
+
+
+function formfield($table,$field,$type,$value)
+{
+	global $conn;
+	//lets have a think about central feilds 
+	if($type=="tinyint(1)") //lets look for boolean.... 
+		{
+			echo "$field: ";
+			//echo "<input name='$field' type='text' size=50 value='$value'/>";
+			if($value==1){$checked="checked='checked'";}else{$checked= "";}
+			echo "<input type='checkbox' name='$field' value='$value' $checked>";
+		}
+	elseif(preg_match('/int/',$type))
+		{
+			echo "$field: ";
+			echo "<input name='$field' type='text' size=50 value='$value'/>";
+		}
+	elseif(preg_match('/char/',$type))
+		{
+			
+			echo "$field: ";
+			echo "<input name='$field' type='text' size=50 value='$value'/>";
+		}
+	elseif(preg_match('/decimal/',$type))
+		{
+			
+			echo "$field: ";
+			echo "<input name='$field' type='text' size=12 value='$value'/>";
+		}
+	elseif(preg_match('/enum/',$type))
+		{
+			
+			echo "$field: (enum)";
+			$sql = "SHOW COLUMNS FROM `$table` LIKE '$field'";
+			$resulte = mysqli_query($conn, $sql);
+			$row = mysqli_fetch_assoc($resulte);
+			$cell = $row['Type'];
+			$data = explode('(',$cell);
+			$data = explode(')',$data[1]);
+			$data = $data[0];
+			$data = explode(',',$data);
+			
+			echo "<select name='$field'/>";
+			foreach($data as $option)
+			{
+				$option = trim($option,"'");
+				//if default or select - selected="selected" 
+				
+				echo "<option value='$option'";
+					if($option==$value){echo "selected='selected'";}
+				echo ">$option</option>";
+			}
+			echo "</select>";
+		}
+	elseif(preg_match('/date/',$type))
+		{
+			echo "$field: (YYYY-MM-DD)";
+			echo "<input name='$field' type='text' size=10 value='$value'/>";
+		}
+	elseif(preg_match('/text/',$type))
+		{
+			echo "$field: ";
+			echo "<textarea name='$field'>$value</textarea>";
+		}
+	else 
+	{echo "unknown field type in PHPQuickForm";}
+}
+
+
+
+
 
 ?>
